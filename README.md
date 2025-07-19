@@ -76,11 +76,44 @@ chmod +x scripts/*.sh
 docker-compose build ur-simulation
 ```
 
-### 3. Run the Simulation Environment
+### 3. Test the Full Simulation Environment
 
+Now you can test the complete simulation that includes the robot arm visualization:
+
+**Option A: Quick Test (Headless Mode)**
 ```bash
-# Start the simulation container
-docker-compose up ur-simulation
+# Run the test simulation script
+docker run --rm -it fyp_v2_ur-simulation:latest /workspace/scripts/test_simulation.sh
+```
+
+**Option B: With GUI Support (Linux X11)**
+```bash
+# Enable X11 forwarding for GUI applications
+xhost +local:docker
+
+# Run with GUI support to see RViz2 and robot visualization
+docker run --rm -it \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  fyp_v2_ur-simulation:latest \
+  /workspace/scripts/test_simulation.sh
+
+# Clean up X11 permissions after use
+xhost -local:docker
+```
+
+**Option C: Interactive Development**
+```bash
+# Start interactive container
+docker run --rm -it fyp_v2_ur-simulation:latest
+
+# Inside the container, manually launch simulation components:
+# 1. Launch UR simulation with RViz
+ros2 launch ur_bringup ur5e.launch.py use_fake_hardware:=true launch_rviz:=true
+
+# In a new terminal/tab, start your custom nodes:
+ros2 run ur_control robot_controller.py
+ros2 run ur_state_monitor state_monitor.py
 ```
 
 ### 4. Interactive Development

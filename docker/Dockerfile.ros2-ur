@@ -1,7 +1,16 @@
 # Use ROS 2 Humble as base image
 FROM ros:humble
 
-# Set environment variables
+# Set environment v# Copy project files
+COPY src/ ${WORKSPACE}/src/
+COPY launch/ ${WORKSPACE}/launch/
+COPY config/ ${WORKSPACE}/config/
+COPY scripts/ ${WORKSPACE}/scripts/
+
+# Make scripts executable
+RUN chmod +x ${WORKSPACE}/scripts/*.sh
+
+# Initialize rosdepes
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_DISTRO=humble
 ENV WORKSPACE=/workspace
