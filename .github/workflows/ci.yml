@@ -1,0 +1,52 @@
+name: ROS 2 Universal Robots CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup ROS 2 Humble
+      uses: ros-tooling/setup-ros@v0.6
+      with:
+        required-ros-distributions: humble
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-colcon-common-extensions
+        rosdep update
+        rosdep install --from-paths src --ignore-src -r -y
+    
+    - name: Build workspace
+      run: |
+        source /opt/ros/humble/setup.bash
+        colcon build --packages-select ur_control ur_state_monitor
+    
+    - name: Run tests
+      run: |
+        source /opt/ros/humble/setup.bash
+        source install/setup.bash
+        colcon test --packages-select ur_control ur_state_monitor
+        colcon test-result --verbose
+
+  docker-build:
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build Docker image
+      run: |
+        docker build -f docker/Dockerfile.ros2-ur -t ur-ros2-sim .
+    
+    - name: Test Docker container
+      run: |
+        docker run --rm ur-ros2-sim ros2 pkg list | grep ur_control

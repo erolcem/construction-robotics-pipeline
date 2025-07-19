@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  ur-simulation:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ros2-ur
+    container_name: ur_ros2_simulation
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - ROS_DOMAIN_ID=0
+      - ROBOT_MODEL=ur5e
+      - SIMULATION_MODE=true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./src:/workspace/src:rw
+      - ./launch:/workspace/launch:rw
+      - ./config:/workspace/config:rw
+      - ./logs:/workspace/logs:rw
+    ports:
+      - "11311:11311"
+      - "11345:11345"
+      - "8080:8080"
+    networks:
+      - ros_network
+    stdin_open: true
+    tty: true
+    privileged: true
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               source /workspace/install/setup.bash &&
+               ros2 launch launch/ur_sim_launch.py"
+
+  ur-real:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ros2-ur
+    container_name: ur_ros2_real
+    environment:
+      - ROS_DOMAIN_ID=0
+      - ROBOT_MODEL=ur5e
+      - SIMULATION_MODE=false
+      - ROBOT_IP=${ROBOT_IP:-192.168.1.100}
+    volumes:
+      - ./src:/workspace/src:rw
+      - ./launch:/workspace/launch:rw
+      - ./config:/workspace/config:rw
+      - ./logs:/workspace/logs:rw
+    ports:
+      - "11311:11311"
+      - "11345:11345"
+    networks:
+      - ros_network
+    stdin_open: true
+    tty: true
+    profiles:
+      - real-robot
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               source /workspace/install/setup.bash &&
+               ros2 launch launch/ur_real_launch.py robot_ip:=${ROBOT_IP:-192.168.1.100}"
+
+  monitoring:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ros2-ur
+    container_name: ur_monitoring
+    environment:
+      - ROS_DOMAIN_ID=0
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./logs:/workspace/logs:rw
+    ports:
+      - "8081:8081"
+    networks:
+      - ros_network
+    depends_on:
+      - ur-simulation
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               source /workspace/install/setup.bash &&
+               ros2 run ur_state_monitor state_monitor_node"
+
+networks:
+  ros_network:
+    driver: bridge

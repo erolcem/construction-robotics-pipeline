@@ -1,0 +1,105 @@
+# Simulation Configuration
+simulation:
+  enable: true
+  physics_engine: "gazebo"
+  real_time_factor: 1.0
+  step_size: 0.001  # seconds
+  
+  # Gazebo world settings
+  world:
+    gravity: [0.0, 0.0, -9.81]
+    magnetic_field: [6e-06, 2.3e-05, -4.2e-05]
+    
+  # Robot model in simulation
+  robot:
+    spawn_position: [0.0, 0.0, 1.0]  # [x, y, z]
+    spawn_orientation: [0.0, 0.0, 0.0]  # [roll, pitch, yaw]
+    
+  # Environment objects
+  environment:
+    ground_plane: true
+    table:
+      enable: true
+      position: [0.5, 0.0, 0.4]
+      size: [1.0, 1.0, 0.8]
+    
+    # Obstacles for testing
+    obstacles:
+      - name: "box1"
+        type: "box"
+        position: [0.3, 0.3, 0.9]
+        size: [0.1, 0.1, 0.1]
+        color: [1.0, 0.0, 0.0, 1.0]  # RGBA
+      
+      - name: "cylinder1"
+        type: "cylinder"
+        position: [-0.3, 0.3, 0.9]
+        radius: 0.05
+        height: 0.2
+        color: [0.0, 1.0, 0.0, 1.0]  # RGBA
+
+# Visualization settings
+visualization:
+  rviz:
+    display_robot: true
+    display_trajectory: true
+    display_planning_scene: true
+    
+    # RViz config
+    fixed_frame: "base_link"
+    target_frame: "tool0"
+    
+    # Marker settings
+    trajectory_color: [0.0, 0.5, 1.0, 0.8]
+    collision_color: [1.0, 0.0, 0.0, 0.5]
+    
+  # Motion planning visualization
+  planning:
+    show_workspace: true
+    show_start_state: true
+    show_goal_state: true
+    show_explored_tree: false
+    show_robot_visual: true
+    show_robot_collision: false
+
+# Sensor simulation
+sensors:
+  force_torque:
+    enable: true
+    noise_std_dev: 0.1
+    update_rate: 1000.0  # Hz
+    
+  joint_encoders:
+    noise_std_dev: 0.001  # radians
+    
+  # Camera simulation (future expansion)
+  cameras:
+    wrist_camera:
+      enable: false
+      resolution: [640, 480]
+      fov: 60.0  # degrees
+      position: [0.0, 0.0, 0.1]  # relative to tool0
+      
+# Performance settings
+performance:
+  max_iterations: 1000
+  convergence_threshold: 0.001
+  timeout: 10.0  # seconds
+  
+  # Real-time constraints
+  real_time:
+    enable: true
+    max_step_time: 0.01  # seconds
+    
+# Logging configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARN, ERROR
+  log_joint_states: true
+  log_cartesian_pose: true
+  log_forces: true
+  log_planning_requests: true
+  
+  # File output
+  output_file: "/workspace/logs/simulation.log"
+  max_file_size: "100MB"
+  backup_count: 5

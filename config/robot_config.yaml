@@ -1,0 +1,88 @@
+# Universal Robots Configuration
+robot:
+  model: "ur5e"
+  description: "Universal Robots UR5e"
+  degrees_of_freedom: 6
+  
+  # Joint limits (in radians)
+  joint_limits:
+    shoulder_pan_joint: [-6.28318, 6.28318]
+    shoulder_lift_joint: [-6.28318, 6.28318]
+    elbow_joint: [-3.14159, 3.14159]
+    wrist_1_joint: [-6.28318, 6.28318]
+    wrist_2_joint: [-6.28318, 6.28318]
+    wrist_3_joint: [-6.28318, 6.28318]
+  
+  # Velocity limits (rad/s)
+  velocity_limits:
+    shoulder_pan_joint: 2.16
+    shoulder_lift_joint: 2.16
+    elbow_joint: 3.15
+    wrist_1_joint: 3.2
+    wrist_2_joint: 3.2
+    wrist_3_joint: 3.2
+  
+  # Acceleration limits (rad/s²)
+  acceleration_limits:
+    shoulder_pan_joint: 15.0
+    shoulder_lift_joint: 15.0
+    elbow_joint: 15.0
+    wrist_1_joint: 15.0
+    wrist_2_joint: 15.0
+    wrist_3_joint: 15.0
+
+# Control parameters
+control:
+  frequency: 50.0  # Hz
+  position_tolerance: 0.01  # radians
+  velocity_tolerance: 0.1   # rad/s
+  
+  # PID gains for joint control
+  pid_gains:
+    shoulder_pan_joint: {p: 100.0, i: 0.1, d: 10.0}
+    shoulder_lift_joint: {p: 100.0, i: 0.1, d: 10.0}
+    elbow_joint: {p: 100.0, i: 0.1, d: 10.0}
+    wrist_1_joint: {p: 50.0, i: 0.05, d: 5.0}
+    wrist_2_joint: {p: 50.0, i: 0.05, d: 5.0}
+    wrist_3_joint: {p: 50.0, i: 0.05, d: 5.0}
+
+# Network configuration
+network:
+  robot_ip: "192.168.1.100"
+  robot_port: 30002
+  rt_port: 30003
+  dashboard_port: 29999
+  
+# Safety parameters
+safety:
+  max_joint_velocity: 3.0  # rad/s
+  max_cartesian_velocity: 1.0  # m/s
+  max_force: 100.0  # N
+  max_torque: 50.0  # Nm
+  
+  # Emergency stop conditions
+  emergency_stop:
+    joint_position_error: 0.5  # radians
+    joint_velocity_error: 2.0  # rad/s
+    communication_timeout: 1.0  # seconds
+    
+# Workspace limits (base_link frame)
+workspace:
+  x_min: -1.0
+  x_max: 1.0
+  y_min: -1.0
+  y_max: 1.0
+  z_min: 0.0
+  z_max: 1.5
+
+# Tool configuration
+tool:
+  tcp_offset: [0.0, 0.0, 0.1, 0.0, 0.0, 0.0]  # [x, y, z, rx, ry, rz]
+  mass: 0.5  # kg
+  center_of_gravity: [0.0, 0.0, 0.05]  # [x, y, z] relative to TCP
+
+# Home positions
+home_positions:
+  default: [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0]
+  transport: [0.0, -2.0, -1.0, -1.57, 0.0, 0.0]
+  maintenance: [1.57, -1.5708, 0.0, -1.5708, 0.0, 0.0]

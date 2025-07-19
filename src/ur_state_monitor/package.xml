@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>ur_state_monitor</name>
+  <version>1.0.0</version>
+  <description>Universal Robots state monitoring package for ROS 2</description>
+  
+  <maintainer email="your.email@example.com">Your Name</maintainer>
+  <license>MIT</license>
+  
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+  
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>ur_msgs</depend>
+  
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
