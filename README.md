@@ -1,20 +1,20 @@
-# 🤖 Universal Robots ROS 2 Control Platform
+#  Universal Robots ROS 2 Control Platform
 
 **Complete Ubuntu setup for controlling UR robots with ROS 2 - works with both simulation and real robots**
 
-##  What You'll Get
+##  Aim
 
 After following this guide, you'll have:
-- ✅ **Working UR5e robot simulation** that you can control via commands
-- ✅ **Real-time robot control** - move joints, execute trajectories  
-- ✅ **Robot state monitoring** - see positions, velocities, forces
-- ✅ **GUI visualization** with RViz (optional)
-- ✅ **Easy switching** between simulation and real robot
-- ✅ **Docker containerized** - consistent across all Ubuntu systems
+-  **Working UR5e robot simulation** that you can control via commands
+-  **Real-time robot control** - move joints, execute trajectories  
+-  **Robot state monitoring** - see positions, velocities, forces
+-  **GUI visualization** with RViz (optional)
+-  **Easy switching** between simulation and real robot
+-  **Docker containerized** - consistent across all Ubuntu systems
 
 ---
 
-## 📋 Requirements
+##  Requirements
 
 - **Ubuntu 22.04 LTS** (or 20.04/24.04)
 - **8GB RAM minimum** (16GB recommended)
@@ -23,7 +23,7 @@ After following this guide, you'll have:
 
 ---
 
-## 🚀 Complete Setup Guide (Ubuntu from Scratch)
+## Complete Setup Guide (Ubuntu from Scratch)
 
 ### Step 1: Install Docker
 
@@ -100,7 +100,7 @@ docker-compose build ur-simulation
 
 ---
 
-## 🎮 Quick Start - Control Your Robot in 3 Commands
+##  Quick Start - Control Your Robot in 3 Commands
 
 ### Option A: Headless Mode (Works Immediately)
 
@@ -128,7 +128,7 @@ velocity: []
 effort: []"
 ```
 
-🎉 **Your robot just moved!** You can see the joint positions changing.
+ **Your robot just moved!** You can see the joint positions changing.
 
 ### Option B: With GUI (RViz Visualization)
 
@@ -148,7 +148,7 @@ xhost -local:docker
 
 ---
 
-## 🎯 Robot Control Examples
+##  Robot Control Examples
 
 ### Basic Position Commands
 
@@ -196,7 +196,7 @@ ros2 run ur_control joint_controller.py
 
 ---
 
-## 🔄 Switching to Real Robot
+## Switching to Real Robot
 
 When you have a physical UR robot:
 
@@ -215,11 +215,11 @@ docker-compose --profile real-robot up ur-real
 # Your commands now control the real robot instead of simulation
 ```
 
-⚠️ **Safety Note**: Always have the emergency stop accessible when using real robots!
+ **Safety Note**: Always have the emergency stop accessible when using real robots!
 
 ---
 
-## 🛠️ Troubleshooting
+##  Troubleshooting
 
 ### Problem: "Cannot start service ur-simulation: Mounts denied"
 **Solution**: This is a Docker Desktop issue on Linux. Use the headless mode:
@@ -269,7 +269,7 @@ docker-compose --profile gui up ur-gui-simulation
 
 ---
 
-## 📊 Understanding the Robot
+## Understanding the Robot
 
 ### UR5e Joint Layout
 - **Joint 1**: Base rotation (shoulder_pan_joint)
@@ -299,7 +299,7 @@ Now that you have a working robot control system, you can:
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 fyp_v2/
@@ -316,21 +316,21 @@ fyp_v2/
 
 ---
 
-## 🎊 Success Checklist
+##  Success Checklist
 
 After setup, you should be able to:
 
-- ✅ Run `docker-compose up ur-simulation` without errors
-- ✅ Connect with `docker exec -it ur_ros2_simulation bash`  
-- ✅ See robot joints with `ros2 topic echo /joint_states`
-- ✅ Move robot with position commands
-- ✅ (Optional) See 3D robot in RViz with GUI mode
+-  Run `docker-compose up ur-simulation` without errors
+-  Connect with `docker exec -it ur_ros2_simulation bash`  
+-  See robot joints with `ros2 topic echo /joint_states`
+-  Move robot with position commands
+-  (Optional) See 3D robot in RViz with GUI mode
 
 **If all checkboxes work, congratulations! You have a fully functional Universal Robots ROS 2 control system! 🎉**
 
 ---
 
-## 📞 Support
+## Support
 
 If you encounter issues:
 1. Check the troubleshooting section above
@@ -376,7 +376,7 @@ ros2 run ur_control robot_controller.py
 ros2 run ur_state_monitor state_monitor.py
 ```
 
-## 🎯 VS Code Tasks
+## VS Code Tasks
 
 The project includes pre-configured VS Code tasks for common operations:
 
@@ -386,7 +386,7 @@ The project includes pre-configured VS Code tasks for common operations:
 - **Run Robot Controller**: Launch the robot controller
 - **Run State Monitor**: Start the state monitoring
 
-## 📦 Packages
+## Packages
 
 ### ur_control
 **Purpose**: Robot control and trajectory execution
@@ -402,7 +402,7 @@ The project includes pre-configured VS Code tasks for common operations:
 - Logs robot status and diagnostics
 - Provides safety monitoring
 
-## 🔧 Configuration
+## Configuration
 
 ### Robot Models
 Supported Universal Robots models:
@@ -424,7 +424,7 @@ environment:
   - SIMULATION_MODE=true   # Set to false for real robot
 ```
 
-## 🖥️ GUI Support
+## GUI Support
 
 For GUI applications (RViz2, Gazebo), enable X11 forwarding in `docker-compose.yml`:
 
@@ -436,7 +436,7 @@ volumes:
   - /tmp/.X11-unix:/tmp/.X11-unix:rw
 ```
 
-## 🔍 Troubleshooting
+##  Troubleshooting
 
 ### Common Issues
 
@@ -468,7 +468,7 @@ volumes:
 - Use `colcon build --symlink-install` for faster iteration
 - Check logs in the `logs/` directory for debugging
 
-## 🔮 Future Expansion
+##  Future Expansion
 
 This platform is designed to support:
 - **MiR Robot Integration**: Autonomous mobile robots
@@ -477,14 +477,14 @@ This platform is designed to support:
 - **Advanced AI Integration**: Machine learning for robotics
 - **Industrial IoT**: Integration with factory systems
 
-## 📚 Documentation
+##  Documentation
 
 - [Setup Guide](docs/setup.md)
 - [Usage Examples](docs/usage.md)
 - [API Reference](docs/api.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
-## 🤝 Contributing
+##  Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -492,11 +492,11 @@ This platform is designed to support:
 4. Test with both simulation and real robot (if available)
 5. Submit a pull request
 
-## 📄 License
+## License
 
 [Add your license here]
 
-## 📞 Support
+## Support
 
 For questions and support:
 - Create an issue in this repository
@@ -505,7 +505,7 @@ For questions and support:
 
 ---
 
-**Built with ❤️ for the robotics community**
+**Built with for the robotics community**
 
 ## Features
 
