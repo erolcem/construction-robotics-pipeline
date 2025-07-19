@@ -4,10 +4,19 @@ set -e
 # Source ROS 2 environment
 source /opt/ros/humble/setup.bash
 
-# Source workspace if it exists
-if [ -f /workspace/install/setup.bash ]; then
-    source /workspace/install/setup.bash
+# Clean build directories if they exist to prevent symlink issues
+if [ -d "/workspace/build" ]; then
+    echo "Cleaning build directories..."
+    rm -rf /workspace/build /workspace/install /workspace/log
 fi
+
+# Build the workspace with fresh start
+echo "Building workspace..."
+cd /workspace
+colcon build --symlink-install
+
+# Source workspace setup
+source /workspace/install/setup.bash
 
 # Set display for GUI applications (if available)
 export QT_X11_NO_MITSHM=1

@@ -9,13 +9,22 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclpy REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(control_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
+find_package(moveit_msgs REQUIRED)
+find_package(ur_msgs REQUIRED)
 
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
 
-# Install Python scripts
+# Install Python executables
 install(PROGRAMS
   ur_control/robot_controller.py
+  ur_control/joint_controller.py
+  ur_control/control_demo.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
