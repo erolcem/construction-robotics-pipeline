@@ -2,7 +2,7 @@
 
 **Complete Ubuntu setup for controlling UR robots with ROS 2 - works with both simulation and real robots**
 
-## 🎯 What You'll Get
+##  What You'll Get
 
 After following this guide, you'll have:
 - ✅ **Working UR5e robot simulation** that you can control via commands
