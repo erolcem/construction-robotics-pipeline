@@ -15,7 +15,7 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python scripts
 install(PROGRAMS
-  scripts/state_monitor.py
+  ur_state_monitor/state_monitor.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

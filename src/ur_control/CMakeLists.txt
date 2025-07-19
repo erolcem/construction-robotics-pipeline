@@ -15,22 +15,8 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python scripts
 install(PROGRAMS
-  scripts/robot_controller.py
-  scripts/trajectory_executor.py
-  scripts/joint_controller.py
+  ur_control/robot_controller.py
   DESTINATION lib/${PROJECT_NAME}
-)
-
-# Install launch files
-install(DIRECTORY
-  launch
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-# Install config files
-install(DIRECTORY
-  config
-  DESTINATION share/${PROJECT_NAME}/
 )
 
 if(BUILD_TESTING)

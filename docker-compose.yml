@@ -7,13 +7,11 @@ services:
       dockerfile: docker/Dockerfile.ros2-ur
     container_name: ur_ros2_simulation
     environment:
-      - DISPLAY=${DISPLAY}
-      - QT_X11_NO_MITSHM=1
       - ROS_DOMAIN_ID=0
       - ROBOT_MODEL=ur5e
       - SIMULATION_MODE=true
+      - HEADLESS=true
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ./src:/workspace/src:rw
       - ./launch:/workspace/launch:rw
       - ./config:/workspace/config:rw
