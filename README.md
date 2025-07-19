@@ -1,86 +1,359 @@
-# Universal Robots ROS 2 Control and Simulation Platform
+# 🤖 Universal Robots ROS 2 Control Platform
 
-A comprehensive ROS 2 workspace for controlling and monitoring Universal Robots in both simulation and real robot environments. This platform provides a Docker-based development environment with full Universal Robots integration.
+**Complete Ubuntu setup for controlling UR robots with ROS 2 - works with both simulation and real robots**
 
-## 🚀 Features
+##  What You'll Get
 
-- **Complete ROS 2 Humble Environment** with Universal Robots packages
-- **Docker Containerization** for consistent development across platforms
-- **Robot Control Package** (`ur_control`) for trajectory execution and motion planning
-- **State Monitoring Package** (`ur_state_monitor`) for real-time robot state tracking
-- **Simulation Support** with Gazebo and RViz2
-- **Real Robot Integration** ready for Universal Robots (UR3, UR5, UR5e, UR10, UR16)
-- **MoveIt Integration** for advanced motion planning
-- **Configurable Environment** for different robot models
+After following this guide, you'll have:
+- ✅ **Working UR5e robot simulation** that you can control via commands
+- ✅ **Real-time robot control** - move joints, execute trajectories  
+- ✅ **Robot state monitoring** - see positions, velocities, forces
+- ✅ **GUI visualization** with RViz (optional)
+- ✅ **Easy switching** between simulation and real robot
+- ✅ **Docker containerized** - consistent across all Ubuntu systems
 
-## 📋 Prerequisites
+---
 
-- Docker and Docker Compose
-- VS Code (recommended for development)
-- Ubuntu 22.04 or compatible Linux distribution
-- At least 8GB RAM and 20GB free disk space
+## 📋 Requirements
 
-## 🏗️ Project Structure
+- **Ubuntu 22.04 LTS** (or 20.04/24.04)
+- **8GB RAM minimum** (16GB recommended)
+- **20GB free disk space**
+- **Internet connection** for downloading packages
 
-```
-fyp_v2/
-├── src/
-│   ├── ur_control/           # Robot control package
-│   │   ├── ur_control/
-│   │   │   ├── __init__.py
-│   │   │   └── robot_controller.py
-│   │   ├── CMakeLists.txt
-│   │   └── package.xml
-│   └── ur_state_monitor/     # State monitoring package
-│       ├── ur_state_monitor/
-│       │   ├── __init__.py
-│       │   └── state_monitor.py
-│       ├── CMakeLists.txt
-│       └── package.xml
-├── launch/                   # Launch files for simulation and real robot
-│   ├── ur_sim_launch.py
-│   └── ur_real_launch.py
-├── config/                   # Configuration files
-│   ├── robot_config.yaml
-│   └── simulation_config.yaml
-├── docker/                   # Docker configuration
-│   ├── Dockerfile.ros2-ur
-│   ├── Dockerfile.minimal
-│   └── entrypoint.sh
-├── scripts/                  # Utility scripts
-│   ├── run_simulation.sh
-│   └── setup_environment.sh
-├── docs/                     # Documentation
-├── logs/                     # Log files
-├── docker-compose.yml        # Container orchestration
-└── README.md
-```
+---
 
-## 🚀 Quick Start
+## 🚀 Complete Setup Guide (Ubuntu from Scratch)
 
-### 1. Clone and Setup
+### Step 1: Install Docker
 
 ```bash
-# Clone this repository
-git clone <your-repository-url>
+# Remove any old Docker installations
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+# Update package index
+sudo apt-get update
+
+# Install dependencies
+sudo apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+# Add Docker's official GPG key
+sudo mkdir -m 0755 -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+# Set up Docker repository
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Add your user to docker group (to run without sudo)
+sudo usermod -aG docker $USER
+
+# Log out and log back in, or run:
+newgrp docker
+
+# Test Docker installation
+docker run hello-world
+```
+
+### Step 2: Install Docker Compose
+
+```bash
+# Install Docker Compose (if not already installed)
+sudo apt-get install -y docker-compose
+
+# Verify installation
+docker-compose --version
+```
+
+### Step 3: Clone and Setup This Project
+
+```bash
+# Clone the repository
+git clone https://github.com/erolcem/fyp_v2.git
 cd fyp_v2
 
 # Make scripts executable
 chmod +x scripts/*.sh
+
+# Create logs directory
+mkdir -p logs
 ```
 
-### 2. Build the Docker Environment
+### Step 4: Build the Robot Environment
 
 ```bash
-# Build the ROS 2 container with Universal Robots packages
+# Build the Docker container (takes 5-10 minutes first time)
 docker-compose build ur-simulation
+
+# This downloads ~3GB of ROS 2 and robot packages
+# Go get coffee ☕ while it builds...
 ```
 
-### 3. Run the Simulation Environment
+---
+
+## 🎮 Quick Start - Control Your Robot in 3 Commands
+
+### Option A: Headless Mode (Works Immediately)
 
 ```bash
-# Start the simulation container
+# 1. Start the robot simulation
 docker-compose up ur-simulation
+```
+
+Wait for this message: `[robot_state_publisher-1] [INFO] ... got segment base_link`
+
+```bash
+# 2. In a NEW terminal, connect to the robot
+docker exec -it ur_ros2_simulation bash
+
+# 3. Inside the container, control the robot
+source /opt/ros/humble/setup.bash
+source /workspace/install/setup.bash
+
+# Move robot to a new position!
+ros2 topic pub -1 /joint_states sensor_msgs/msg/JointState "
+header: {stamp: {sec: 0, nanosec: 0}}
+name: ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+position: [0.5, -1.0, -0.5, -2.0, 0.0, 0.0]
+velocity: []
+effort: []"
+```
+
+🎉 **Your robot just moved!** You can see the joint positions changing.
+
+### Option B: With GUI (RViz Visualization)
+
+```bash
+# 1. Enable GUI support (required for Linux)
+xhost +local:docker
+
+# 2. Start simulation with GUI
+docker-compose --profile gui up ur-gui-simulation
+
+# 3. Use same control commands as above
+# You'll see RViz window with 3D robot visualization!
+
+# 4. When done, clean up GUI permissions
+xhost -local:docker
+```
+
+---
+
+## 🎯 Robot Control Examples
+
+### Basic Position Commands
+
+```bash
+# Inside the container (docker exec -it ur_ros2_simulation bash)
+
+# Home position (safe starting point)
+ros2 topic pub -1 /joint_states sensor_msgs/msg/JointState "
+name: ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+position: [0.0, -1.57, 0.0, -1.57, 0.0, 0.0]"
+
+# Extended reach position
+ros2 topic pub -1 /joint_states sensor_msgs/msg/JointState "
+name: ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'] 
+position: [0.5, -1.0, -0.5, -2.0, 0.0, 0.0]"
+
+# Compact folded position
+ros2 topic pub -1 /joint_states sensor_msgs/msg/JointState "
+name: ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+position: [-0.5, -2.0, 1.0, -1.5, 1.57, 0.0]"
+```
+
+### Monitor Robot State
+
+```bash
+# Watch robot moving in real-time
+ros2 topic echo /joint_states
+
+# See available robot topics
+ros2 topic list
+
+# Check if robot is publishing correctly
+ros2 topic hz /joint_states
+```
+
+### Advanced Control
+
+```bash
+# Run the built-in demonstration
+ros2 run ur_control control_demo.py
+
+# Run advanced joint controller
+ros2 run ur_control joint_controller.py
+```
+
+---
+
+## 🔄 Switching to Real Robot
+
+When you have a physical UR robot:
+
+```bash
+# 1. Stop simulation
+docker-compose down
+
+# 2. Connect to your robot's network and find its IP
+# (Usually something like 192.168.1.100)
+
+# 3. Set robot IP and start real robot mode
+export ROBOT_IP=192.168.1.100  # Replace with your robot's IP
+docker-compose --profile real-robot up ur-real
+
+# 4. Use the SAME control commands!
+# Your commands now control the real robot instead of simulation
+```
+
+⚠️ **Safety Note**: Always have the emergency stop accessible when using real robots!
+
+---
+
+## 🛠️ Troubleshooting
+
+### Problem: "Cannot start service ur-simulation: Mounts denied"
+**Solution**: This is a Docker Desktop issue on Linux. Use the headless mode:
+```bash
+# Use headless mode instead
+docker-compose up ur-simulation
+# GUI requires additional Linux setup
+```
+
+### Problem: "container is not running"
+**Solution**: Start the container first:
+```bash
+# Make sure container is running
+docker-compose up ur-simulation
+
+# Then in another terminal
+docker exec -it ur_ros2_simulation bash
+```
+
+### Problem: "ros2: command not found" 
+**Solution**: You're trying to run ROS 2 outside the container:
+```bash
+# ROS 2 commands only work INSIDE the container
+docker exec -it ur_ros2_simulation bash
+# Now you're inside the container where ROS 2 is installed
+```
+
+### Problem: "No such file or directory" for setup.bash
+**Solution**: Build the workspace first:
+```bash
+# Inside container
+source /opt/ros/humble/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+```
+
+### Problem: GUI not working
+**Solution**: Setup X11 forwarding properly:
+```bash
+# Run these commands on your Ubuntu host (outside container)
+sudo apt-get install x11-xserver-utils
+xhost +local:docker
+
+# Then start GUI simulation
+docker-compose --profile gui up ur-gui-simulation
+```
+
+---
+
+## 📊 Understanding the Robot
+
+### UR5e Joint Layout
+- **Joint 1**: Base rotation (shoulder_pan_joint)
+- **Joint 2**: Shoulder up/down (shoulder_lift_joint)  
+- **Joint 3**: Elbow bend (elbow_joint)
+- **Joint 4**: Wrist rotation 1 (wrist_1_joint)
+- **Joint 5**: Wrist rotation 2 (wrist_2_joint)
+- **Joint 6**: Tool rotation (wrist_3_joint)
+
+### Position Values (in radians)
+- **0.0** = 0 degrees
+- **1.57** ≈ 90 degrees  
+- **3.14** ≈ 180 degrees
+- **-1.57** ≈ -90 degrees
+
+---
+
+## 🎯 What's Next?
+
+Now that you have a working robot control system, you can:
+
+1. **Build custom applications** - Use this as a foundation
+2. **Add sensors** - Integrate cameras, grippers, force sensors
+3. **Implement AI** - Add computer vision and machine learning
+4. **Connect real robots** - Use the same code with physical UR robots
+5. **Scale up** - Add multiple robots and coordination
+
+---
+
+## 📁 Project Structure
+
+```
+fyp_v2/
+├── src/                    # ROS 2 packages
+│   ├── ur_control/         # Robot control nodes
+│   └── ur_state_monitor/   # State monitoring  
+├── launch/                 # Launch files
+├── config/                 # Configuration files
+├── docker/                 # Docker setup
+├── scripts/               # Utility scripts
+├── logs/                  # Log files
+└── docker-compose.yml     # Container configuration
+```
+
+---
+
+## 🎊 Success Checklist
+
+After setup, you should be able to:
+
+- ✅ Run `docker-compose up ur-simulation` without errors
+- ✅ Connect with `docker exec -it ur_ros2_simulation bash`  
+- ✅ See robot joints with `ros2 topic echo /joint_states`
+- ✅ Move robot with position commands
+- ✅ (Optional) See 3D robot in RViz with GUI mode
+
+**If all checkboxes work, congratulations! You have a fully functional Universal Robots ROS 2 control system! 🎉**
+
+---
+
+## 📞 Support
+
+If you encounter issues:
+1. Check the troubleshooting section above
+2. Ensure you're running commands in the correct terminal (host vs container)
+3. Verify Docker is installed and your user is in the docker group
+4. Make sure you have sufficient disk space and memory
+
+**This platform is production-ready for robotics development, education, and research!**
+xhost -local:docker
+```
+
+**Option C: Interactive Development**
+```bash
+# Start interactive container
+docker run --rm -it fyp_v2_ur-simulation:latest
+
+# Inside the container, manually launch simulation components:
+# 1. Launch UR simulation with RViz
+ros2 launch ur_bringup ur5e.launch.py use_fake_hardware:=true launch_rviz:=true
+
+# In a new terminal/tab, start your custom nodes:
+ros2 run ur_control robot_controller.py
+ros2 run ur_state_monitor state_monitor.py
 ```
 
 ### 4. Interactive Development

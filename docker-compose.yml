@@ -1,6 +1,43 @@
 version: '3.8'
 
 services:
+  # GUI Simulation Service (Linux X11 with proper setup)
+  ur-gui-simulation:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ros2-ur
+    container_name: ur_gui_simulation
+    environment:
+      - ROS_DOMAIN_ID=0
+      - ROBOT_MODEL=ur5e
+      - SIMULATION_MODE=true
+      - HEADLESS=false
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - ./src:/workspace/src:rw
+      - ./launch:/workspace/launch:rw
+      - ./config:/workspace/config:rw
+      - ./logs:/workspace/logs:rw
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    ports:
+      - "11311:11311"
+      - "11345:11345"
+      - "8080:8080"
+    networks:
+      - ros_network
+    stdin_open: true
+    tty: true
+    privileged: true
+    profiles:
+      - gui
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               colcon build --symlink-install &&
+               source /workspace/install/setup.bash &&
+               ros2 launch /workspace/launch/ur_gui_simulation.launch.py"
+
+  # Headless Simulation Service (Linux compatible)
   ur-simulation:
     build:
       context: .
@@ -24,11 +61,11 @@ services:
       - ros_network
     stdin_open: true
     tty: true
-    privileged: true
     command: >
       bash -c "source /opt/ros/humble/setup.bash &&
+               colcon build --symlink-install &&
                source /workspace/install/setup.bash &&
-               ros2 launch launch/ur_sim_launch.py"
+               ros2 launch /workspace/launch/ur_simulation.launch.py headless:=true"
 
   ur-real:
     build:
@@ -57,7 +94,31 @@ services:
     command: >
       bash -c "source /opt/ros/humble/setup.bash &&
                source /workspace/install/setup.bash &&
-               ros2 launch launch/ur_real_launch.py robot_ip:=${ROBOT_IP:-192.168.1.100}"
+               ros2 launch /workspace/launch/ur_real_launch.py robot_ip:=${ROBOT_IP:-192.168.1.100}"
+
+  # Control Demo Service
+  ur-control-demo:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ros2-ur
+    container_name: ur_control_demo
+    environment:
+      - ROS_DOMAIN_ID=0
+      - ROBOT_MODEL=ur5e
+      - SIMULATION_MODE=true
+    volumes:
+      - ./src:/workspace/src:rw
+      - ./logs:/workspace/logs:rw
+    networks:
+      - ros_network
+    depends_on:
+      - ur-simulation
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               colcon build --symlink-install &&
+               source /workspace/install/setup.bash &&
+               sleep 5 &&
+               ros2 run ur_control control_demo.py"
 
   monitoring:
     build:
@@ -79,7 +140,7 @@ services:
     command: >
       bash -c "source /opt/ros/humble/setup.bash &&
                source /workspace/install/setup.bash &&
-               ros2 run ur_state_monitor state_monitor_node"
+               ros2 run ur_state_monitor state_monitor.py"
 
   ur-minimal:
     build:

@@ -2,6 +2,18 @@
 FROM ros:humble
 
 # Set environment variables
+ENV WORKSPACE=/workspace
+
+# Copy project files to temp locations first
+COPY src/ /src/
+COPY launch/ /launch/
+COPY config/ /config/
+COPY scripts/ /scripts/
+
+# Make scripts executable
+RUN chmod +x /scripts/*.sh
+
+# Initialize rosdepes
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_DISTRO=humble
 ENV WORKSPACE=/workspace
@@ -65,7 +77,7 @@ RUN pip3 install \
 
 # Create workspace
 WORKDIR ${WORKSPACE}
-RUN mkdir -p ${WORKSPACE}/src
+RUN mkdir -p ${WORKSPACE}/src ${WORKSPACE}/logs
 
 # Copy source files
 COPY src/ ${WORKSPACE}/src/
