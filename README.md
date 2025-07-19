@@ -54,12 +54,20 @@ cd fyp_v2
 
 2. Build the Docker environment:
 ```bash
+# Build the Docker image (this may take 10-15 minutes on first run)
 docker-compose build
+
+# Alternatively, build just the simulation service
+docker-compose build ur-simulation
 ```
 
 3. Start the simulation:
 ```bash
-./scripts/run_simulation.sh
+# Option 1: Using the convenience script
+./scripts/run_simulation.sh --docker
+
+# Option 2: Using Docker Compose directly  
+docker-compose up ur-simulation
 ```
 
 ### Usage

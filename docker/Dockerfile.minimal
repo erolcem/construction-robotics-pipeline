@@ -1,0 +1,44 @@
+# Alternative minimal Dockerfile for faster testing
+FROM ros:humble
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ROS_DISTRO=humble
+ENV WORKSPACE=/workspace
+
+# Install essential packages only
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-colcon-common-extensions \
+    python3-rosdep \
+    git \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create workspace
+WORKDIR ${WORKSPACE}
+RUN mkdir -p ${WORKSPACE}/src
+
+# Copy source files
+COPY src/ ${WORKSPACE}/src/
+COPY launch/ ${WORKSPACE}/launch/
+COPY config/ ${WORKSPACE}/config/
+
+# Initialize rosdep and install dependencies
+RUN rosdep init || true
+RUN rosdep update
+RUN rosdep install --from-paths src --ignore-src -r -y || true
+
+# Build the workspace
+RUN /bin/bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && colcon build --packages-select ur_control ur_state_monitor"
+
+# Set up environment
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
+RUN echo "source ${WORKSPACE}/install/setup.bash" >> ~/.bashrc
+
+# Copy entrypoint script
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bash"]

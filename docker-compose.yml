@@ -83,6 +83,30 @@ services:
                source /workspace/install/setup.bash &&
                ros2 run ur_state_monitor state_monitor_node"
 
+  ur-minimal:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.minimal
+    container_name: ur_ros2_minimal
+    environment:
+      - ROS_DOMAIN_ID=0
+      - ROBOT_MODEL=ur5e
+      - SIMULATION_MODE=true
+    volumes:
+      - ./src:/workspace/src:rw
+      - ./launch:/workspace/launch:rw
+      - ./config:/workspace/config:rw
+      - ./logs:/workspace/logs:rw
+    networks:
+      - ros_network
+    stdin_open: true
+    tty: true
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               source /workspace/install/setup.bash &&
+               echo 'UR ROS 2 Minimal Container Ready!' &&
+               bash"
+
 networks:
   ros_network:
     driver: bridge
