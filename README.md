@@ -4,11 +4,11 @@
 
 ##  Aim
 
-After following this guide, you'll have:
+Functions provided by this guide:
 -  **Working UR5e robot simulation** that you can control via commands
 -  **Real-time robot control** - move joints, execute trajectories  
 -  **Robot state monitoring** - see positions, velocities, forces
--  **GUI visualization** with RViz (optional)
+-  **GUI visualization** with RViz 
 -  **Easy switching** between simulation and real robot
 -  **Docker containerized** - consistent across all Ubuntu systems
 
@@ -19,7 +19,6 @@ After following this guide, you'll have:
 - **Ubuntu 22.04 LTS** (or 20.04/24.04)
 - **8GB RAM minimum** (16GB recommended)
 - **20GB free disk space**
-- **Internet connection** for downloading packages
 
 ---
 
@@ -95,7 +94,7 @@ mkdir -p logs
 docker-compose build ur-simulation
 
 # This downloads ~3GB of ROS 2 and robot packages
-# Go get coffee ☕ while it builds...
+# beware this rebuilds from scratch each time.
 ```
 
 ---

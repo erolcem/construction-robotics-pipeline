@@ -72,3 +72,6 @@ logs/
 
 # pytest
 .pytest_cache/
+
+# copilot workflows
+.github/copilot-instructions.md
